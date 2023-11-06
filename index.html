@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>To Do List</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>To-do List</header>
+      <div class="inputField">
+        <input type="text" placeholder="Enter new task" id="textField" />
+        <button class="add"><i class="fas fa-plus"></i></button>
+      </div> 
+      <div class="labels">
+        <label for="category">
+          <h4>Category</h4>
+          <select name="category" class="categorySelector" required></select>
+        </label>
+        <label for="datePicker" id="dueDateLabel">
+          <h4>Due Date</h4>
+          <input name="datePicker" type="date" aria-valuetext="yyyy-mm-dd"></input>
+        </label>
+      </div>
+      <ul class="todoList">
+          
+      </ul>
+      <div class="footer">
+        <span class="pending"></span>
+        <button class="clear">Clear Done</button>
+      </div>
+    </div>
+
+    <div class="categoryCard">
+      <h2>Categories</h2>
+      <ul class="categoryList">
+        
+      </ul>
+    <div>
+      <form onsubmit="addCategory(); return false;" class="addNewCategory">
+        <input type="text" placeholder="Enter new category" id="categoryTextField" />
+        <button class="addCategory"><i class="fas fa-plus" onclick="submit"></i></button>
+      </form>
+    </div>
+    <script src="todolist.js"></script>
+  </body>
+</html>
