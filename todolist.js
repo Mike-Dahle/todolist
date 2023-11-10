@@ -16,13 +16,13 @@ populateCategories(categories);
 populatetodoList(tasks);
 
 // Create a new task
-function createTask(task, category) {
+function createTask(task, category, dueDate) {
     tasks.push({
       todo: task,
       done: false,
       Id: Date.now(),
       category: category,
-      dueDate: ''
+      dueDate: dueDate
     },)
   }
 
@@ -54,7 +54,11 @@ function populatetodoList(tasks) {
         const trashIcon = document.createElement('i');
         const editIcon = document.createElement('i');
         const taskText = document.createElement('p');
-        const dueDate = document.createElement('p');
+        const dueDate = document.createElement('input');
+        dueDate.setAttribute('type', 'date');
+        dueDate.classList.add('dateInput')
+        dueDate.value = task.dueDate;  
+        
         taskText.textContent = task.todo;
 
         trashIcon.classList.add('fa', 'fa-trash');
@@ -63,6 +67,7 @@ function populatetodoList(tasks) {
 
 
         li.appendChild(taskText);
+        li.appendChild(dueDate);
         li.appendChild(spanOne);
         li.appendChild(spanTwo);
 
@@ -100,10 +105,10 @@ function populatetodoList(tasks) {
 // Add a new task to the list
 addTask.addEventListener('click', () => {
     const categorySelect = document.querySelector('.categorySelector');
-    const dueDate = document.querySelector('#dueDate');
+    const dueDate = document.querySelector('.dateInput');
     const category = categorySelect.value;
     if (input.value !== '') {
-        createTask(input.value, category)
+        createTask(input.value, category, dueDate.value)
         input.value = ''
         todoList.innerHTML = ''
         populatetodoList(tasks) 
