@@ -4,31 +4,51 @@ const todoList = document.querySelector('.todoList')
 const pendingText = document.querySelector('.pending')
 const clearBtn = document.querySelector('.clear')
 
+//const tasks = []
+//const categories = ['All', 'Work', 'School', 'Home']
 
-// Need Add, Edit, Delete, and Clear Done to work.
+function fetchTasks() {
+    fetch('http://localhost:5501/todos')
+        .then(response => response.json())
+        .then(data => {
+            populatetodoList(data);
+            pendingText.textContent = `You have ${pendingTasks(data)} remaining task(s)`
+        })
+        .catch(error => console.error('Error:', error));
+}
 
-const tasks = []
+// populate the list
+fetchTasks();
 
-const categories = ['All', 'Work', 'School', 'Home']
 
-
-populateCategories(categories);
-populatetodoList(tasks);
+/* populateCategories(categories);
+populatetodoList(tasks); */
 
 // Create a new task
-function createTask(task, category, dueDate) {
-    tasks.push({
-      todo: task,
-      done: false,
-      Id: Date.now(),
-      category: category,
-      dueDate: dueDate
-    },)
-  }
+function createTask() {
+    const taskInput = document.getElementById('new-task-name'); // Assuming you have an input field with this ID
+    const task = taskInput.value;
+    const category = 'default'; // Modify as per your category logic
+    const dueDate = '2021-01-01'; // Modify as per your due date logic
 
-pendingText.textContent = `You have ${pendingTasks(tasks)} remaining task(s)`
+    fetch('http://localhost:5501/todos', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ todo: task, category: category, dueDate: dueDate }),
+    })
+    .then(response => response.json())
+    .then(() => {
+        fetchTasks(); // Refresh the list
+        taskInput.value = ''; // Clear the input field
+    })
+    .catch(error => console.error('Error:', error));
+}
 
-clearBtn.addEventListener('click', () => {clearDone(tasks)})
+
+
+clearBtn.addEventListener('click', () => {clearDone(data)})
 
 // Populate the todo list
 function populatetodoList(tasks) {
@@ -38,12 +58,12 @@ function populatetodoList(tasks) {
         todoList.removeChild(todoList.firstChild);
     }
 
-    categories.forEach((category) => {
+/*     categories.forEach((category) => {
         const ul = document.createElement('ul');
         ul.setAttribute('id', category);
         ul.innerHTML = `<h2>${category}</h2>`;
         todoList.appendChild(ul);
-    });
+    }); */
 
     // Create list elements for each todo
     tasks.forEach((task) => {
@@ -83,13 +103,10 @@ function populatetodoList(tasks) {
         spanOne.appendChild(editIcon);
         spanTwo.appendChild(trashIcon);
         spanOne.addEventListener('click', () => {editTask(task.Id)});
-        spanTwo.addEventListener('click', (event) => {
-            const li = event.target.closest('li'); // Find the closest parent 'li' element
-            if (li) {
-                const listItemText = li.textContent.trim();
-                deleteTask(listItemText);
-            }
+        spanTwo.addEventListener('click', () => {
+            deleteTask(task.Id);
         });
+        
 
         taskText.addEventListener('click', (event) => {markDone(task.Id);})
 
@@ -107,7 +124,8 @@ function populatetodoList(tasks) {
 }
 
 // Add a new task to the list
-addTask.addEventListener('click', () => {
+addTask.addEventListener('click', createTask);
+/* addTask.addEventListener('click', () => {
     const categorySelect = document.querySelector('.categorySelector');
     const dueDate = document.querySelector('.dateInput');
     const category = categorySelect.value;
@@ -115,28 +133,28 @@ addTask.addEventListener('click', () => {
         createTask(input.value, category, dueDate.value)
         input.value = ''
         todoList.innerHTML = ''
-        populatetodoList(tasks) 
+        fetchTasks() 
     }      
-})
+}) */
 
 
 // for each item in the array if the task name matches the li item and its done, then delete it from the array
-function deleteTask(text) { 
-    const index = tasks.findIndex((task) => task.todo === text);
-    if (index > -1) {
-        tasks.splice(index, 1);
-        populatetodoList(tasks);
-    }
-    pendingText.textContent = `You have ${pendingTasks(tasks)} remaining task(s)`
+function deleteTask(taskId) {
+    fetch(`http://localhost:5501/todos/${taskId}`, {
+        method: 'DELETE',
+    })
+    .then(() => fetchTasks()) // Refresh the list
+    .catch(error => console.error('Error:', error));
 }
 
 
+//check
 function clearDone(tasks) {
-  tasks.filter((task) => task.done === true).forEach((task) => {
+  data.filter((task) => task.done === true).forEach((task) => {
     const index = tasks.findIndex((task) => task.done === true);
     if (index > -1) {
         tasks.splice(index, 1);
-        populatetodoList(tasks);
+        fetchTasks()
     }
   }
 )}
@@ -146,28 +164,34 @@ function pendingTasks(arr) {
     return arr.filter((arr) => arr.done === false).length
 }
 
-function editTask(taskID) {
-    const taskToUpdate = tasks.find((task) => task.Id === taskID);
+function editTask(taskId) {
+    const newName = prompt("Enter new name for the task"); // Simple prompt for new name, replace with your logic
+    if (!newName) return; // Exit if no new name is provided
 
-    if (taskToUpdate) {
-        const newName = prompt('Enter new task name', taskToUpdate.todo);
-        if (newName !== null) {
-            taskToUpdate.todo = newName;
-            populatetodoList(tasks);
-            taskToUpdate.done = false;
-        }
-    }
+    fetch(`http://localhost:5501/todos/${taskId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ todo: newName }),
+    })
+    .then(() => fetchTasks())
+    .catch(error => console.error('Error:', error));
 }
 
-function markDone(finishedID) {
-    const taskToUpdate = tasks.find((task) => task.Id === finishedID);
-
-    if (taskToUpdate) {
-        taskToUpdate.done = !taskToUpdate.done; // Toggle the 'done' property
-        populatetodoList(tasks);
-    }
+function markDone(taskId) {
+    fetch(`http://localhost:5501/todos/${taskId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ done: true }),
+    })
+    .then(() => fetchTasks())
+    .catch(error => console.error('Error:', error));
 }
 
+/* 
 function populateCategories() {
     const categoryList = document.querySelector('.categoryList');
     const categorySelector = document.querySelector('.categorySelector');
@@ -248,4 +272,4 @@ function editCategory(category) {
             populatetodoList(tasks); // Pass the updated tasks array
         }
     }
-}
+} */
