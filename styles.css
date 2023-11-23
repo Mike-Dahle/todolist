@@ -244,7 +244,7 @@ label h4 {
   margin-left: 1rem;
 }
 
-input[type="date"]{
+.dateInput {
     background-color: var(--main-white);
     padding: .5rem;
     font-family: "Roboto Mono",monospace;
@@ -255,11 +255,25 @@ input[type="date"]{
     border-radius: 5px;
     box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.1);
 }
+
+.dueDate {
+    background-color: var(--main-white);
+    width: 14rem;
+    padding: .5rem;
+    margin-right: 5.5rem;
+    font-family: "Roboto Mono",monospace;
+    color: black;
+    font-size: 1rem;
+    border: none;
+    outline: none;
+}
+
 ::-webkit-calendar-picker-indicator{
     border: var(--main-blue) 2px solid;
-    padding: 5px;
+    padding: .25rem;
     cursor: pointer;
-    border-radius: 3px;
+    border-radius: 6px;
+    
 }
 
 .categorySelector {

@@ -56,8 +56,12 @@ function populatetodoList(tasks) {
         const taskText = document.createElement('p');
         const dueDate = document.createElement('input');
         dueDate.setAttribute('type', 'date');
-        dueDate.classList.add('dateInput')
-        dueDate.value = task.dueDate;  
+        dueDate.classList.add('dueDate')
+        dueDate.value = task.dueDate;
+        
+        dueDate.addEventListener('change', (event) => {
+            task.dueDate = event.target.value
+        })
         
         taskText.textContent = task.todo;
 

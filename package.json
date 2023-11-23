@@ -1,0 +1,21 @@
+{
+  "name": "todolist",
+  "version": "1.0.0",
+  "description": "This application is built for my UVU DGM 3760 course and the goal is to develop a To-Do List app that functions entirely off of Javascript. To see my live deployment of this project, click [here](https://dgm-todolist.netlify.app)",
+  "main": "todolist.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon todolist.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "mongodb": "^6.3.0",
+    "mongoose": "^8.0.1",
+    "nodemon": "^3.0.1"
+  }
+}
