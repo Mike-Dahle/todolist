@@ -4,7 +4,7 @@ const port = 5501;
 const app = express();
 const cors = require('cors');
 app.use(cors());
-
+app.use(express.json());
 
 app.use(bodyParser.json());
 
@@ -12,21 +12,21 @@ app.listen(port, () => {
     console.log(`Server listening on port ${port}`);
 });
 
-let todos = [
-    {
-        todo: "Homework",
-        done: false,
-        id: 1,
-        category: "School",
-        dueDate: "2021-03-01"
-    },
-];
+let data = {
+    "todos": [
+        {
+            todo: "Homework",
+            done: false,
+            id: 1,
+            category: "School",
+            dueDate: "2021-03-01"
+        },
+    ],
+    "categories": ['All', 'Work', 'School', 'Home'],
+}
 
-let categories = ['All', 'Work', 'School', 'Home'];
-
-// Get To-Dos
-app.get('/todos', (req, res) => {
-    res.json(todos);
+app.get('/data', (req, res) => {
+    res.json(data);
 });
 
 // Post To-Do
@@ -42,46 +42,57 @@ app.post('/todos', (req, res) => {
         category: req.body.category,
         dueDate: req.body.dueDate
     };
-    todos.push(newTodo);
+    data.todos.push(newTodo); // Fixed variable name
     res.json(newTodo);
 });
 
 // Put To-Do
 app.put('/todos/:id', (req, res) => {
     const id = parseInt(req.params.id);
-    const todoIndex = todos.findIndex(todo => todo.id === id);
+    const todoIndex = data.todos.findIndex(todo => todo.id === id);
 
     if (todoIndex === -1) {
         return res.status(404).send("To-Do not found.");
     }
 
-    todos[todoIndex].done = !todos[todoIndex].done;
-    res.json(todos[todoIndex]);
+    // Check if the 'done' property is present
+    if (req.body.hasOwnProperty('done')) {
+        data.todos[todoIndex].done = req.body.done;
+    }
+
+    // Check if the 'todo' property (task name) is present
+    if (req.body.hasOwnProperty('todo')) {
+        data.todos[todoIndex].todo = req.body.todo;
+    }
+
+    res.json(data.todos[todoIndex]);
 });
+
+
 
 // Delete To-Do
 app.delete('/todos/:id', (req, res) => {
     const id = parseInt(req.params.id);
-    const todoIndex = todos.findIndex(todo => todo.id === id);
+    const index = data.todos.findIndex(todo => todo.id === id);
 
-    if (todoIndex === -1) {
-        return res.status(404).send("To-Do not found.");
+    if (index !== -1) {
+        data.todos.splice(index, 1);
+        res.json({ message: 'Todo deleted successfully.' });
+    } else {
+        res.status(404).json({ message: 'Todo not found.' });
     }
-
-    todos.splice(todoIndex, 1);
-    res.send("To-Do deleted successfully.");
 });
 
 // Get all To-Dos for a category
 app.get('/category/:category/todos', (req, res) => {
     const category = req.params.category;
-    const categoryTodos = todos.filter(todo => todo.category === category);
+    const categoryTodos = data.todos.filter(todo => todo.category === category); // Fixed variable name
     res.json(categoryTodos);
 });
 
 // Get Categories
 app.get('/categories', (req, res) => {
-    res.json(categories);
+    res.json(data.categories);
 });
 
 // Post Category
@@ -91,7 +102,7 @@ app.post('/categories', (req, res) => {
         return res.status(400).send("Category is required.");
     }
 
-    categories.push(newCategory);
+    data.categories.push(newCategory); // Fixed variable name
     res.send("Category added successfully.");
 });
 
@@ -99,25 +110,32 @@ app.post('/categories', (req, res) => {
 app.put('/categories/:category', (req, res) => {
     const oldCategory = req.params.category;
     const newCategory = req.body.category;
-    const index = categories.findIndex(cat => cat === oldCategory);
+    const index = data.categories.findIndex(cat => cat === oldCategory); // Fixed variable name
 
     if (index === -1) {
         return res.status(404).send("Category not found.");
     }
 
-    categories[index] = newCategory;
+    data.categories[index] = newCategory; // Fixed variable name
     res.send("Category updated successfully.");
 });
 
 // Delete Category
 app.delete('/categories/:category', (req, res) => {
     const category = req.params.category;
-    const index = categories.findIndex(cat => cat === category);
+    const index = data.categories.findIndex(cat => cat === category); // Fixed variable name
 
     if (index === -1) {
         return res.status(404).send("Category not found.");
     }
 
-    categories.splice(index, 1);
+    data.categories.splice(index, 1); // Fixed variable name
     res.send("Category deleted successfully.");
 });
+
+app.delete('/todos', (req, res) => {
+    data.todos = data.todos.filter(todo => !todo.done);
+    res.send('Completed tasks cleared');
+});
+
+
